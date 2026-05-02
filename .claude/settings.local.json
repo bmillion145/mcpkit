@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx --yes create-next-app@latest . --typescript --eslint --tailwind --src-dir --app --turbopack --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(npx --yes create-next-app@latest mcpkit --typescript --eslint --tailwind --src-dir --app --turbopack --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(npx --yes create-next-app@latest . --typescript --eslint --tailwind --src-dir --app --turbopack --import-alias \"@/*\" --use-npm --no-git --yes)",
+      "Bash(npx --yes create-next-app@15 . --typescript --eslint --tailwind --src-dir --app --turbopack --import-alias \"@/*\" --use-npm --no-git --yes)",
+      "Bash(npx --yes shadcn@latest init --base-color slate --yes --force)",
+      "Bash(npx --yes shadcn@latest init --help)",
+      "Bash(npx --yes shadcn@latest init --preset base-slate --force --yes)",
+      "Bash(npx --yes shadcn@2.10.0 init --base-color slate --yes --force)",
+      "Bash(npx --yes shadcn@latest add button card input textarea badge tabs alert dialog sonner separator label --yes --overwrite)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)"
+    ]
+  }
+}
