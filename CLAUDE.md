@@ -17,10 +17,14 @@ Free MCP server validator and config tools, with a paid API tier.
 - `src/app/` — App Router routes, layouts, pages, route handlers
 - `src/components/ui/` — shadcn/ui primitives (do not edit manually; regenerate via `npx shadcn add <name>`)
 - `src/components/` — application-level components built on top of `ui/`
-- `src/lib/` — shared utilities (`utils.ts` exports `cn`); add db client, Stripe, Clerk helpers here
+- `src/lib/` — shared utilities (`utils.ts` exports `cn`); add Stripe and Clerk helpers here
+- `src/lib/db/` — Drizzle schema + Neon client (`getDb()`, `isDbConfigured()`); import from `@/lib/db`
 - `src/app/api/` — route handlers for the paid API tier and webhooks (Stripe, Clerk)
+- `drizzle/` — generated SQL migrations and journal; do not edit applied files
+- `scripts/db-migrate.ts` — runs migrations against `DATABASE_URL` via `npm run db:migrate`
 - `public/` — static assets
 - `components.json` — shadcn/ui config (slate base color)
+- `drizzle.config.ts` — drizzle-kit config; reads `DATABASE_URL` from `.env.local`
 
 ## Coding conventions
 
@@ -30,6 +34,8 @@ Free MCP server validator and config tools, with a paid API tier.
 - **Dark mode is the default** — `<html className="dark">` is set in `src/app/layout.tsx`; do not add a light-mode toggle without confirming first
 - **Imports use the `@/*` alias** — e.g., `import { Button } from "@/components/ui/button"`
 - **Tailwind v4** — theme tokens live in `src/app/globals.css` via `@theme inline`; do not add a `tailwind.config.js`
+- **Database access** — always go through `getDb()` in `@/lib/db`; never instantiate `neon()` or a Drizzle client elsewhere. Routes that hit the DB must `export const runtime = "nodejs"` (the Neon HTTP driver works on edge too, but Node is the default). Use `isDbConfigured()` to gracefully degrade when `DATABASE_URL` is missing — avoid 500s on deployments without it
+- **Schema changes** — edit `src/lib/db/schema.ts`, run `npm run db:generate` to produce a migration in `drizzle/`, commit both, then run `npm run db:migrate` against the target DB. Never edit an already-applied migration file in place
 
 ## Working with this project
 
