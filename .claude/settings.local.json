@@ -25,7 +25,19 @@
       "Bash(node scripts/test-validator.mjs)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/validator)",
       "Bash(curl -s http://localhost:3000/validator)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "WebFetch(domain:mcpkit.vercel.app)",
+      "Bash(curl -s -o /dev/null -w \"/ %{http_code}\\\\n\" https://mcpkit.vercel.app/)",
+      "Bash(curl -s -o /dev/null -w \"/validator %{http_code}\\\\n\" https://mcpkit.vercel.app/validator)",
+      "Bash(curl -s -o /dev/null -w \"/sitemap.xml %{http_code}\\\\n\" https://mcpkit.vercel.app/sitemap.xml)",
+      "Bash(curl -s -o /dev/null -w \"/robots.txt %{http_code}\\\\n\" https://mcpkit.vercel.app/robots.txt)",
+      "Bash(curl -s -X POST https://mcpkit.vercel.app/api/share -H \"Content-Type: application/json\" -d '{\"config\":\"{\\\\\"mcpServers\\\\\":{\\\\\"livecheck\\\\\":{\\\\\"command\\\\\":\\\\\"echo\\\\\",\\\\\"args\\\\\":[\\\\\"hello-from-claude\\\\\"]}}}\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://mcpkit-pd1fuvs2b-bmillion145s-projects.vercel.app__TRACKED_VAR__)",
+      "Bash(curl -s https://mcpkit-pd1fuvs2b-bmillion145s-projects.vercel.app/)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://__TRACKED_VAR__/)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://mcpkit-bmillion145s-projects.vercel.app__TRACKED_VAR__)",
+      "Bash(curl -s https://mcpkit-bmillion145s-projects.vercel.app/)",
+      "Bash(npx --yes shadcn@latest add switch radio-group --yes)"
     ]
   }
 }

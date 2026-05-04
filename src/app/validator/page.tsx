@@ -7,6 +7,7 @@ import {
   AlertCircle,
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   Check,
   ChevronDown,
   ChevronRight,
@@ -31,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
+import { ToolSwitcher } from "@/components/tool-switcher"
 import { cn } from "@/lib/utils"
 import {
   validateMcp,
@@ -420,19 +422,19 @@ export default function ValidatorPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            <span>Back</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <FileJson className="size-4 text-muted-foreground" />
-            <span className="font-mono text-sm">MCP Validator</span>
-          </div>
-          <div className="w-16 text-right" />
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-6">
+          <Button asChild size="sm" variant="ghost" className="gap-1.5">
+            <Link href="/">
+              <ArrowLeft className="size-3.5" />
+              Back
+            </Link>
+          </Button>
+          <Separator orientation="vertical" className="h-5" />
+          <h1 className="text-sm font-semibold tracking-tight">Validator</h1>
+          <Badge variant="secondary" className="font-mono text-[10px]">
+            beta
+          </Badge>
+          <ToolSwitcher className="ml-2" />
         </div>
       </header>
 
@@ -577,7 +579,7 @@ export default function ValidatorPage() {
           </section>
 
           <section className="flex min-h-0 flex-col rounded-xl border border-border/60 bg-card/40">
-            <ResultsHeader pristine={pristine} result={result} />
+            <ResultsHeader pristine={pristine} result={result} code={code} />
             <div className="flex-1 overflow-y-auto md:max-h-[calc(100vh-12rem)]">
               {totalIssues === 0 ? (
                 <EmptyState pristine={pristine} valid={result.valid} />
@@ -592,16 +594,43 @@ export default function ValidatorPage() {
   )
 }
 
+const TOOL_SCHEMA_CODES = new Set([
+  "INVALID_TOOLS",
+  "INVALID_TOOL",
+  "TOOL_MISSING_NAME",
+  "TOOL_NAME_CONVENTION",
+  "TOOL_MISSING_DESCRIPTION",
+  "INVALID_TOOL_DESCRIPTION",
+  "TOOL_MISSING_INPUT_SCHEMA",
+  "INVALID_INPUT_SCHEMA",
+  "INVALID_SCHEMA_TYPE",
+  "SCHEMA_MISSING_TYPE",
+  "NON_OBJECT_INPUT_SCHEMA",
+  "INVALID_PROPERTIES",
+  "INVALID_PROPERTY",
+  "INVALID_REQUIRED",
+  "INVALID_REQUIRED_ITEM",
+])
+
 function ResultsHeader({
   pristine,
   result,
+  code,
 }: {
   pristine: boolean
   result: ValidationResult
+  code: string
 }) {
   const errorCount = result.errors.length
   const warningCount = result.warnings.length
   const infoCount = result.info.length
+
+  const hasToolSchemaIssue = result.errors.some((e) =>
+    TOOL_SCHEMA_CODES.has(e.code),
+  )
+  const schemaBuilderHref = hasToolSchemaIssue
+    ? `/schema-builder?tools=${encodeURIComponent(code)}`
+    : null
 
   if (pristine && result.valid) {
     return (
@@ -655,6 +684,15 @@ function ResultsHeader({
             <Info className="size-3 text-sky-400" />
             {infoCount} info
           </span>
+        )}
+        {schemaBuilderHref && (
+          <Link
+            href={schemaBuilderHref}
+            className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-amber-400 transition-colors hover:bg-amber-500/20"
+          >
+            Fix this in the Schema Builder
+            <ArrowRight className="size-3" />
+          </Link>
         )}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Show, SignInButton, UserButton } from "@clerk/nextjs"
 import {
   ArrowRight,
   Boxes,
@@ -106,6 +107,7 @@ const API_FEATURES = [
 ]
 
 const FOOTER_LINKS = [
+  { label: "Blog", href: "/blog" },
   { label: "Docs", href: "/docs" },
   { label: "GitHub", href: "https://github.com/bmillion145/mcpkit" },
   { label: "Twitter", href: "https://twitter.com" },
@@ -135,9 +137,23 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost">
-              Sign In
-            </Button>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <Button size="sm" variant="ghost">
+                  Sign In
+                </Button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in">
+              <Button asChild size="sm" variant="ghost">
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              <UserButton
+                appearance={{
+                  elements: { avatarBox: "size-8" },
+                }}
+              />
+            </Show>
           </div>
         </div>
       </header>

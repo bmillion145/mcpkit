@@ -1,0 +1,120 @@
+---
+title: "Five MCP config mistakes we see every day"
+description: "A working tour of the broken configs that show up most often in support — and how the validator catches each one."
+date: "2026-04-30"
+tags: ["mcp", "validation", "tutorial"]
+---
+
+We get a lot of "the server won't start" reports. Most of them turn out to be one of five things. Here's the tour, with examples that will fail open in the Validator and the rules that catch them.
+
+## 1. Missing transport
+
+Every server needs either a `command` (stdio) or a `url` (SSE/HTTP). It's easy to forget when you copy a config from one host to another.
+
+```json
+{
+  "mcpServers": {
+    "broken": {
+      "args": ["--token", "abc"]
+    }
+  }
+}
+```
+
+The validator flags this as `MISSING_TRANSPORT`. The fix is to add `command` (for a local subprocess) or `url` (for a remote server).
+
+## 2. Args as a string
+
+`args` must be an array of strings, not a single string. Yes, even if there's only one argument.
+
+```json
+{
+  "mcpServers": {
+    "broken": {
+      "command": "node",
+      "args": "server.js"
+    }
+  }
+}
+```
+
+`INVALID_ARGS`. The fix:
+
+```json
+"args": ["server.js"]
+```
+
+### Why hosts trip on this
+
+Spawning a subprocess with positional args means each token has to be a separate string. A single string would be passed as one argument with spaces in it, which the receiving program would have to re-split — and most don't.
+
+## 3. Env var references that aren't declared
+
+A common pattern is to refer to environment variables in args:
+
+```json
+{
+  "mcpServers": {
+    "broken": {
+      "command": "my-server",
+      "args": ["--token", "${API_TOKEN}"],
+      "env": {
+        "OTHER_VAR": "value"
+      }
+    }
+  }
+}
+```
+
+The validator emits `UNDECLARED_ENV_REF`: `${API_TOKEN}` is referenced but not in `env`. The MCP host won't substitute it for you. Either add `API_TOKEN` to the `env` object or use the literal value.
+
+## 4. JSON with comments
+
+Pasting from a JSONC editor can drop comments into your config. Plain JSON doesn't allow them, so the host's parser dies before validation even runs.
+
+```jsonc
+{
+  // The fs server
+  "mcpServers": {
+    "fs": { "command": "node" }
+  }
+}
+```
+
+Pasted into the Validator, this surfaces a `STRIPPED_COMMENTS` warning because the engine notices comments, removes them, and validates the rest — but it'll still tell you that **the host you're targeting won't do this**. Ship a comment-free config.
+
+## 5. Tool input schema without a type
+
+A subtle one. Tool definitions have an `inputSchema` that's a JSON Schema. If you forget the top-level `type: "object"`, the host can't tell what shape it should send.
+
+```json
+{
+  "tools": [
+    {
+      "name": "search",
+      "description": "Search.",
+      "inputSchema": {
+        "properties": {
+          "query": { "type": "string" }
+        }
+      }
+    }
+  ]
+}
+```
+
+`SCHEMA_MISSING_TYPE`. Fix:
+
+```json
+"inputSchema": {
+  "type": "object",
+  "properties": { "query": { "type": "string" } },
+  "required": ["query"]
+}
+```
+
+The Schema Builder produces the right shape automatically — if you find yourself hand-writing more than a couple of these, switch to the visual builder.
+
+## In summary
+
+The validator catches all five of these and a couple dozen more, with line numbers when there's a JSON parse error and JSON Pointer paths when there's a schema issue. Drop a config in and try it.

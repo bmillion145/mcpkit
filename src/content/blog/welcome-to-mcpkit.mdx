@@ -1,0 +1,55 @@
+---
+title: "Welcome to MCPKit"
+description: "Why we built a free toolkit for the Model Context Protocol — and what's in the box."
+date: "2026-04-28"
+tags: ["mcp", "announcement"]
+---
+
+If you've spent any time wiring up Model Context Protocol servers, you've probably hit the same walls we did: configs that fail silently, tool schemas the host won't accept, error messages that show up only after you've restarted Claude Desktop for the third time.
+
+MCPKit is the toolkit we wanted while we were building. It's free, it runs in your browser, and it's open source.
+
+## What's in the box
+
+Three tools that share the same validation engine:
+
+- **Validator** — paste a config or a tool definition and get pinpoint errors with line numbers. No more squinting at host logs.
+- **Config Generator** — a form-driven way to produce `claude_desktop_config.json`, `.mcp.json`, or generic JSON for any MCP host.
+- **Schema Builder** — a visual editor for tool input schemas (which is just JSON Schema). Build it, test it with sample data, and copy the result into your server.
+
+All three are available without an account. The paid API tier exists for teams who want CI/CD validation, but everything you see in the browser is free forever.
+
+## A small example
+
+Here's the smallest valid client config:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    }
+  }
+}
+```
+
+That works. Drop it into the Validator and you'll see a green pill. Now break it on purpose — change `command` to an empty string, or rename `mcpServers` to `mcp_servers` — and watch the validator point at exactly what's wrong.
+
+### What the validator catches
+
+A short list of the failure modes we see most often:
+
+- Missing transport: a server with neither `command` nor `url`
+- Args as a string instead of an array
+- Env var references like `${API_KEY}` that aren't declared in `env`
+- JSON parse errors caused by trailing commas pasted from a JSONC config
+- Tool input schemas missing a top-level `type`
+
+The Validator handles all of these — and several it's seen in the wild.
+
+## What's next
+
+We're working on the API tier (CI/CD validation, GitHub Action), better error explanations powered by the spec text, and per-host quirk linting (Cursor and Claude Desktop disagree on a few corner cases). If there's something you'd like to see, [open an issue](https://github.com/bmillion145/mcpkit) or yell at us.
+
+Welcome aboard. Hope it saves you a debugging session or two.
