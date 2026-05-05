@@ -37,7 +37,9 @@
       "Bash(curl -s -o /dev/null -w '%{http_code}' https://__TRACKED_VAR__/)",
       "Bash(curl -s -o /dev/null -w '%{http_code}' https://mcpkit-bmillion145s-projects.vercel.app__TRACKED_VAR__)",
       "Bash(curl -s https://mcpkit-bmillion145s-projects.vercel.app/)",
-      "Bash(npx --yes shadcn@latest add switch radio-group --yes)"
+      "Bash(npx --yes shadcn@latest add switch radio-group --yes)",
+      "Bash(curl -s -I https://mcpkit-bmillion145s-projects.vercel.app/dashboard)",
+      "Bash(curl -s -I https://mcpkit-bmillion145s-projects.vercel.app/)"
     ]
   }
 }
